@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viewer Announcements</title>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+    }
+
+    .announcement {
+      margin-top: 20px;
+      padding: 10px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .pinned {
+      background-color: #ffd700;
+      border: 1px solid #e5c100;
+    }
+
+    .time {
+      font-size: 12px;
+      color: #888;
+      margin-top: 5px;
+      text-align: right;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .back-btn:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Viewer Announcements</h1>
+  <div class="container">
+    <div id="announcements"></div>
+
+    <!-- Button to go back to the User List page -->
+    <a href="userlist.html" class="back-btn">Back to User List</a>
+  </div>
+
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_UjSLiTFca7sEs6Xjo3KJt3gv7irm4yM",
+      authDomain: "last-try-e2368.firebaseapp.com",
+      databaseURL: "https://last-try-e2368-default-rtdb.firebaseio.com",
+      projectId: "last-try-e2368",
+      storageBucket: "last-try-e2368.appspot.com",
+      messagingSenderId: "96302628355",
+      appId: "1:96302628355:web:a87f636cec98c89d2f9836"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const announcementsDiv = document.getElementById("announcements");
+
+    // Format time in a conversational way (like WhatsApp/Instagram)
+    function formatTime(timestamp) {
+      const now = new Date();
+      const time = new Date(timestamp);
+      const diff = now - time;
+
+      if (diff < 60000) return 'Just now';
+      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+
+      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+      return time.toLocaleDateString('en-US', options);
+    }
+
+    // Listen for new announcements in real-time (for viewers only)
+    onValue(ref(db, "announcements"), (snapshot) => {
+      announcementsDiv.innerHTML = ""; // Clear the list before updating
+      const data = snapshot.val();
+      if (data) {
+        const keys = Object.keys(data).sort((a, b) => b - a);
+        keys.forEach((key) => {
+          const announcement = data[key];
+          const div = document.createElement("div");
+          div.className = "announcement";
+          const formattedTime = formatTime(announcement.time);
+
+          if (announcement.pinned) {
+            div.classList.add("pinned");
+            div.innerHTML = `<strong>📌 Pinned: ${announcement.message}</strong><div class="time">${formattedTime}</div>`;
+          } else {
+            div.innerHTML = `<strong>${announcement.message}</strong><div class="time">${formattedTime}</div>`;
+          }
+
+          announcementsDiv.appendChild(div);
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

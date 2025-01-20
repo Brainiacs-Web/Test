@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00c6ff">
+  <title>User List</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      color: black;
+    }
+
+    .user-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .username {
+      flex: 1;
+      text-align: left;
+    }
+
+    .exp {
+      flex: 1;
+      text-align: right;
+    }
+
+    /* From Uiverse.io by eirikvold */
+    button {
+      font-family: inherit;
+      font-size: 18px;
+      background: linear-gradient(to bottom, #4dc7d9 0%, #66a6ff 100%);
+      color: white;
+      padding: 0.8em 1.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 25px;
+      box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    button:active {
+      transform: scale(0.95);
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    button span {
+      display: block;
+      margin-left: 0.4em;
+      transition: all 0.3s;
+    }
+
+    button svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+      transition: all 0.3s;
+    }
+
+    button .svg-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.2);
+      margin-right: 0.5em;
+      transition: all 0.3s;
+    }
+
+    button:hover .svg-wrapper {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+
+    button:hover svg {
+      transform: rotate(45deg);
+    }
+
+    /* Ensure the button is on top */
+    .announcements-btn-container {
+      margin-bottom: 20px;
+    }
+
+    /* Remove underline from the <a> link */
+    a {
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Move the button to the top inside a container -->
+    <div class="announcements-btn-container">
+      <a href="viewer.html">
+        <button>Go to Announcements</button>
+      </a>
+    </div>
+
+    <h1>User List</h1>
+    <section>
+      <ul id="userListUl" class="user-list" aria-live="polite">
+        <!-- User list will appear here -->
+      </ul>
+    </section>
+  </div>
+
+  <script type="module">
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_UjSLiTFca7sEs6Xjo3KJt3gv7irm4yM",
+      authDomain: "last-try-e2368.firebaseapp.com",
+      projectId: "last-try-e2368",
+      storageBucket: "last-try-e2368.appspot.com",
+      messagingSenderId: "96302628355",
+      appId: "1:96302628355:web:a87f636cec98c89d2f9836"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const userListUl = document.getElementById("userListUl");
+
+    // Real-time listener for user data from Firestore
+    onSnapshot(collection(db, "users"), (querySnapshot) => {
+      const users = [];
+      querySnapshot.forEach((doc) => {
+        const username = doc.id;
+        const exp = doc.data().exp || 0;
+        users.push({ username, exp });
+      });
+
+      users.sort((a, b) => b.exp - a.exp); // Sort by EXP descending
+
+      userListUl.innerHTML = ""; // Clear existing user list
+      users.forEach(({ username, exp }) => {
+        const listItem = document.createElement("li");
+        listItem.className = "user-item";
+
+        const usernameDiv = document.createElement("div");
+        usernameDiv.className = "username";
+        usernameDiv.textContent = username;
+
+        const expDiv = document.createElement("div");
+        expDiv.className = "exp";
+        expDiv.textContent = `EXP: ${exp}`;
+
+        listItem.appendChild(usernameDiv);
+        listItem.appendChild(expDiv);
+
+        userListUl.appendChild(listItem);
+      });
+    });
+  </script>
+</body>
+
+</html>

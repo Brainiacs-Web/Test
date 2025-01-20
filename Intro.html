@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00c6ff">
+  <title>Intro</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Welcome to the Introduction</h1>
+
+    <section>
+      <h2>Latest Announcements</h2>
+      <ul id="announcementsList"></ul>
+    </section>
+  </div>
+
+  <script type="module">
+    import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB_UjSLiTFca7sEs6Xjo3KJt3gv7irm4yM",
+      authDomain: "last-try-e2368.firebaseapp.com",
+      projectId: "last-try-e2368",
+      storageBucket: "last-try-e2368.appspot.com",
+      messagingSenderId: "96302628355",
+      appId: "1:96302628355:web:a87f636cec98c89d2f9836"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const announcementsList = document.getElementById("announcementsList");
+
+    // Function to display announcements
+    function displayAnnouncements() {
+      const announcementsRef = collection(db, "announcements");
+
+      onSnapshot(announcementsRef, (querySnapshot) => {
+        announcementsList.innerHTML = ""; // Clear existing list
+        querySnapshot.forEach((doc) => {
+          const announcement = doc.data().text;  // Assuming the field name is 'text'
+          const listItem = document.createElement("li");
+          listItem.textContent = announcement;
+          announcementsList.appendChild(listItem);
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", displayAnnouncements);
+  </script>
+</body>
+
+</html>
