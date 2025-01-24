@@ -7,9 +7,179 @@
   <meta name="theme-color" content="#00c6ff">
   <title>EXP Tracker</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+/* Global Styling */
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Jost', sans-serif;
+  background: #000000; /* Pure black background for a sleek look */
+  color: white; /* White text for better readability */
+}
+
+/* Container Styling */
+.container {
+  width: 90%; /* Adjust width for responsiveness */
+  max-width: 450px;
+  padding: 30px;
+  background: rgba(20, 20, 20, 0.95); /* Darker background for high contrast */
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2); /* Bright outer shadow */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: auto; /* Adjust based on content */
+}
+
+/* Heading Styles */
+h1 {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #00ffff; /* Cyan for modern look */
+  text-shadow: 0 0 12px #00ffff; /* Glowing effect */
+}
+
+/* Three-dot Menu */
+#threeDotMenu {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 26px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+#threeDotMenu:hover {
+  color: #00ffff;
+}
+
+#menuOptions {
+  display: none;
+  position: absolute;
+  top: 50px;
+  left: 20px;
+  background: rgba(30, 30, 30, 0.95); /* Subtle menu background */
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(255, 255, 255, 0.15);
+  padding: 10px;
+  list-style: none;
+  z-index: 1000;
+  width: 150px; /* Set a fixed width */
+}
+
+#menuOptions li {
+  padding: 8px 10px; /* Adjust padding for compact look */
+  margin: 5px 0;
+  font-size: 1em;
+  border-radius: 5px;
+  color: white;
+  transition: background 0.3s ease;
+  text-align: center; /* Align the text to the center */
+}
+
+#menuOptions li:hover {
+  background: #00ffff;
+  color: #000000;
+  cursor: pointer;
+}
+
+
+/* Input and Button Styling */
+input,
+select,
+button {
+  width: 85%;
+  padding: 12px;
+  margin: 10px auto;
+  border-radius: 6px;
+  border: none;
+  outline: none;
+  font-size: 1em;
+  transition: box-shadow 0.3s ease;
+}
+
+input,
+select {
+  background: #1c1c1c;
+  color: #ffffff;
+  box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+}
+
+input::placeholder {
+  color: #888888;
+  font-size: 0.9em;
+}
+
+input:focus,
+select:focus {
+  box-shadow: 0 0 12px #00ffff; /* Glow focus effect */
+}
+
+button {
+  background: #333333; /* Neutral button background */
+  color: #00ffff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+  background: #00ffff; /* Cyan hover effect */
+  color: #000000;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* User List Styling */
+ul {
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+
+li {
+  padding: 10px;
+  margin: 5px 0;
+  background: rgba(255, 255, 255, 0.1); /* Transparent list item background */
+  border-radius: 5px;
+  text-align: left;
+  font-size: 1em;
+  transition: background 0.3s ease;
+}
+
+li:hover {
+  background: #00ffff;
+  color: #000000;
+  cursor: pointer;
+}
+
+
+
+  </style>
 </head>
 
 <body>
+  <!-- Three Dot Menu -->
+  <div id="threeDotMenu">⋮</div>
+  <ul id="menuOptions">
+    <li onclick="window.location.href='introadmin.html'">Introduction</li>
+    <li onclick="window.location.href='userlist.html'">Userlist</li>
+    <li onclick="window.location.href='index.html'">Login Page</li>
+  </ul>
+
   <div class="container">
     <h1>EXP Tracker</h1>
 
@@ -30,11 +200,6 @@
       </div>
 
       <button id="confirmBtn" aria-label="Confirm EXP Entry">Confirm</button>
-
-      <div class="manual-exp">
-        <input id="manualExpInput" type="number" placeholder="Manual EXP" aria-label="Manual EXP">
-        <button id="addManualExpBtn" aria-label="Add Manual EXP">Add Manual EXP</button>
-      </div>
     </section>
 
     <section>
@@ -42,19 +207,15 @@
       <ul id="userListUl" aria-live="polite"></ul>
       <button id="removeSelectedBtn" aria-label="Remove Selected Users">Remove Selected</button>
     </section>
-
-    <!-- Make Announcements Button -->
-    <section>
-      <button id="makeAnnouncementsBtn" aria-label="Make Announcements">Make Announcements</button>
-    </section>
-
-    <!-- Edit Introduction Button -->
-    <section>
-      <button id="editIntroBtn" aria-label="Edit Introduction">Edit Introduction</button>
-    </section>
   </div>
 
   <script type="module">
+    // Toggle the menu visibility when the three dots are clicked
+    document.getElementById("threeDotMenu").addEventListener("click", function () {
+      const menu = document.getElementById("menuOptions");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    });
+
     // Firebase configuration and initialization
     import { getFirestore, doc, setDoc, getDocs, collection, updateDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -207,18 +368,80 @@
     document.addEventListener("DOMContentLoaded", async function () {
       listenForUserUpdates();  // Set up real-time updates
     });
+  
+  const selectedUsernames = new Set(); // Set to store selected usernames
 
-    // Redirect to `ann.html` when "Make Announcements" button is clicked
-    const makeAnnouncementsBtn = document.getElementById("makeAnnouncementsBtn");
-    makeAnnouncementsBtn.addEventListener("click", function () {
-      window.location.href = "ann.html"; // Redirect to announcements page
+// Event listener to handle selecting usernames for deletion
+userListUl.addEventListener("click", function (event) {
+  if (event.target.tagName === "LI") {
+    const username = event.target.getAttribute("data-username");
+    console.log(`User clicked: ${username}`);
+
+    if (selectedUsernames.has(username)) {
+      selectedUsernames.delete(username);
+      event.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)"; // Deselect user
+    } else {
+      selectedUsernames.add(username);
+      event.target.style.backgroundColor = "#00ffff"; // Highlight selected user
+    }
+
+    console.log(`Currently selected usernames: ${Array.from(selectedUsernames).join(", ")}`);
+  }
+});
+
+// Handle "Remove Selected" button click
+document.getElementById("removeSelectedBtn").addEventListener("click", async function () {
+  if (selectedUsernames.size === 0) {
+    alert("Please select at least one user to remove.");
+    return;
+  }
+
+  const confirmation = confirm("Are you sure you want to remove the selected users?");
+  if (!confirmation) return;
+
+  try {
+    const promises = [];
+    
+    selectedUsernames.forEach((username) => {
+      const userRef = doc(db, "users", username);
+      
+      // Log to ensure we're targeting the right Firestore document
+      console.log(`Attempting to delete user ${username} from Firestore`);
+      
+      // Delete user from Firestore
+      promises.push(deleteDoc(userRef)
+        .then(() => {
+          console.log(`Successfully deleted user ${username} from Firestore.`);
+
+          // After deletion, remove from the UI as well
+          const listItem = document.querySelector(`li[data-username="${username}"]`);
+          if (listItem) {
+            listItem.remove();
+            console.log(`Removed user ${username} from the UI.`);
+          } else {
+            console.error(`Error: User ${username} not found in the UI.`);
+          }
+        })
+        .catch((error) => {
+          console.error(`Error deleting user ${username} from Firestore:`, error);
+        })
+      );
     });
 
-    // Redirect to `Introadmin.html` when "Edit Introduction" button is clicked
-    const editIntroBtn = document.getElementById("editIntroBtn");
-    editIntroBtn.addEventListener("click", function () {
-      window.location.href = "Introadmin.html"; // Redirect to introduction admin page
-    });
+    // Wait for all Firestore deletion operations to complete
+    await Promise.all(promises);
+    
+    // Clear the selected usernames
+    selectedUsernames.clear();
+
+    // Notify user of successful removal
+    alert("Selected users removed successfully.");
+  } catch (error) {
+    console.error("Error during the removal process:", error);
+    alert("An error occurred while removing users. Please try again.");
+  }
+});
+
   </script>
 </body>
 
