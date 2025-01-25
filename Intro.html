@@ -6,15 +6,67 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#00c6ff">
   <title>Intro</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Global Styling */
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Jost', sans-serif;
+      background: #000000; /* Space black background */
+      color: white; /* White text */
+    }
+
+    .container {
+      background: linear-gradient(to bottom, #444444, #666666); /* Gray gradient */
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      max-width: 600px;
+      width: 100%;
+      padding: 20px;
+      color: white; /* Adjust text color for readability */
+    }
+
+    /* Title Styling */
+    .title {
+      font-size: 2em; /* Reduce font size slightly */
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6); /* White text shadow */
+      word-wrap: break-word; /* Allow wrapping for long text */
+      text-align: center; /* Keep the text centered */
+      max-width: 90%; /* Limit the width of the title */
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ul li {
+      background: #333333;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    ul li:hover {
+      background: #555555;
+      transition: 0.3s ease-in-out;
+    }
+  </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>Welcome to the Introduction</h1>
-
+    <h1 class="title">Welcome to Brainiacs</h1>
     <section>
-      <h2>Latest Announcements</h2>
+      <h2>Group Announcements</h2>
       <ul id="announcementsList"></ul>
     </section>
   </div>
@@ -44,9 +96,14 @@
       onSnapshot(announcementsRef, (querySnapshot) => {
         announcementsList.innerHTML = ""; // Clear existing list
         querySnapshot.forEach((doc) => {
-          const announcement = doc.data().text;  // Assuming the field name is 'text'
+          const announcement = doc.data().text; // Assuming the field name is 'text'
+
+          // Create list item
           const listItem = document.createElement("li");
-          listItem.textContent = announcement;
+
+          // Preserve line breaks and spaces
+          listItem.innerHTML = announcement.replace(/\n/g, "<br>");
+
           announcementsList.appendChild(listItem);
         });
       });
