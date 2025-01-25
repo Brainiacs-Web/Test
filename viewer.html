@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,70 +7,117 @@
   <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
   <script type="module" src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f4f4f4;
-    }
+  /* Global Styling */
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Jost', sans-serif;
+  background: #000000; /* Space black background */
+  color: white; /* White text */
+}
 
-    h1 {
-      text-align: center;
-    }
+.main {
+  text-align: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
 
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 20px;
-      background: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
-    }
+/* Title Styling */
+.title {
+  font-size: 2.5em;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.6); /* White text shadow */
+}
 
-    .announcement {
-      margin-top: 20px;
-      padding: 10px;
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-    }
+/* Container Styling */
+.container {
+  width: 100%;
+  max-width: 800px;
+  background: #444444; /* Dark gray background */
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+}
 
-    .pinned {
-      background-color: #ffd700;
-      border: 1px solid #e5c100;
-    }
+/* Announcement Box Styling */
+.announcement {
+  padding: 15px; /* Reduced padding */
+  margin: 10px auto; /* Centered horizontally */
+  border: 1px solid #444444;
+  border-radius: 8px;
+  background: #333333; /* Dark background for non-pinned */
+  color: white; /* White text for non-pinned */
+  font-weight: 500;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  font-size: 0.9rem; /* Slightly smaller font size */
+  width: 90%; /* Smaller width */
+  max-width: 600px; /* Reduced max width */
+  text-align: left;
+  word-wrap: break-word;
+  white-space: normal;
+  box-sizing: border-box;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  outline: none; /* Remove default outline */
+}
 
-    .time {
-      font-size: 12px;
-      color: #888;
-      margin-top: 5px;
-      text-align: right;
-    }
+.announcement:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+}
 
-    .back-btn {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-      font-size: 16px;
-    }
+/* Pinned Announcement Styling */
+.pinned {
+  background: #00FFFF; /* Mint blue for pinned */
+  color: black; /* Black text for pinned */
+  border: 1px solid #888888; /* Gray border */
+  box-shadow: none; /* No glow inside */
+}
 
-    .back-btn:hover {
-      background-color: #45a049;
-    }
+/* Button Styling */
+.back-btn {
+  width: fit-content;
+  margin: 20px auto;
+  padding: 12px 20px;
+  background-color: #333333; /* Dark gray for the button */
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #666666;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+}
+
   </style>
 </head>
-
 <body>
-  <h1>Viewer Announcements</h1>
-  <div class="container">
-    <div id="announcements"></div>
-
-    <!-- Button to go back to the User List page -->
-    <a href="userlist.html" class="back-btn">Back to User List</a>
+  
+  
+  <div class="main">
+    <h1 class="title">Announcements</h1>
+    <div class="container">
+      <div id="announcements"></div>
+      <!-- Button to go back to the User List page -->
+      <a href="userlist.html" class="back-btn">Back to User List</a>
+    </div>
   </div>
 
   <script type="module">
@@ -90,50 +136,47 @@
       appId: "1:96302628355:web:a87f636cec98c89d2f9836"
     };
 
+  
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
     const announcementsDiv = document.getElementById("announcements");
 
-    // Format time in a conversational way (like WhatsApp/Instagram)
-    function formatTime(timestamp) {
-      const now = new Date();
-      const time = new Date(timestamp);
-      const diff = now - time;
-
-      if (diff < 60000) return 'Just now';
-      if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-      if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
-
-      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-      return time.toLocaleDateString('en-US', options);
-    }
-
-    // Listen for new announcements in real-time (for viewers only)
+    // Listen for announcements
     onValue(ref(db, "announcements"), (snapshot) => {
-      announcementsDiv.innerHTML = ""; // Clear the list before updating
+      announcementsDiv.innerHTML = ""; // Clear previous data
       const data = snapshot.val();
       if (data) {
-        const keys = Object.keys(data).sort((a, b) => b - a);
-        keys.forEach((key) => {
-          const announcement = data[key];
+        const announcementsArray = Object.values(data);
+
+        // Sort: Pinned announcements first, then by timestamp
+        announcementsArray.sort((a, b) => {
+          if (a.pinned && !b.pinned) return -1; // Pinned goes first
+          if (!a.pinned && b.pinned) return 1;
+          return b.timestamp - a.timestamp; // Most recent by timestamp
+        });
+
+        announcementsArray.forEach((announcement) => {
           const div = document.createElement("div");
           div.className = "announcement";
-          const formattedTime = formatTime(announcement.time);
-
-          if (announcement.pinned) {
-            div.classList.add("pinned");
-            div.innerHTML = `<strong>📌 Pinned: ${announcement.message}</strong><div class="time">${formattedTime}</div>`;
-          } else {
-            div.innerHTML = `<strong>${announcement.message}</strong><div class="time">${formattedTime}</div>`;
-          }
-
+          if (announcement.pinned) div.classList.add("pinned");
+        
+          div.textContent = announcement.message;
           announcementsDiv.appendChild(div);
         });
       }
     });
+  announcementsArray.forEach((announcement) => {
+  const div = document.createElement("div");
+  div.className = "announcement";
+  if (announcement.pinned) div.classList.add("pinned");
+
+  div.setAttribute("tabindex", "0"); // Makes the element focusable
+  div.textContent = announcement.message;
+  announcementsDiv.appendChild(div);
+});
+
   </script>
 </body>
-
 </html>
