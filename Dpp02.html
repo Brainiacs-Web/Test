@@ -386,7 +386,7 @@
 
   <!-- Subject Selector -->
   <div id="subject-buttons">
-    <button id="subject-English" onclick="loadSubject('English')">English</button>
+    <button id="subject-Maths" onclick="loadSubject('English')">Maths</button>
   </div>
 
   <!-- Modal Overlay for Username -->
@@ -436,11 +436,11 @@
 
     // Global Variables
     let username = "";
-    let currentSubject = "English"; // default subject
+    let currentSubject = "Maths"; // default subject
     let currentQuestionIndex = 0;
     let questions = [];
     let questionsBySubject = {};
-    const subjects = ["English"];
+    const subjects = ["Maths"];
 
     function updateSubjectButtons() {
       subjects.forEach(subject => {
