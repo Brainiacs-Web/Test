@@ -228,8 +228,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Define the sections available
-    const sections = ["English", "Maths"];
+    // Define the section available (only English)
+    const sections = ["English"];
 
     // Chart variables
     let overallChart, subjectChart;
@@ -399,13 +399,13 @@
       return { resultHTML, sectionScore, correctCount, wrongCount, unansweredCount };
     }
 
-    // Function to display results for all sections and the total summary
+    // Function to display results for the section and the total summary
     async function displayResults(username) {
-      console.log("Fetching results for all sections...");
+      console.log("Fetching results for section...");
       let totalScore = 0, totalCorrect = 0, totalWrong = 0, totalUnanswered = 0;
       const sectionResults = {};
 
-      // Fetch results for each section sequentially
+      // Only one section available ("English")
       for (const section of sections) {
         const { resultHTML, sectionScore, correctCount, wrongCount, unansweredCount } = await fetchSectionResult(username, section);
         sectionResults[section] = { resultHTML, sectionScore, correctCount, wrongCount, unansweredCount };
@@ -424,7 +424,7 @@
       `;
       updateOverallChart(totalCorrect, totalWrong, totalUnanswered);
 
-      // Create horizontal buttons for each section
+      // Create horizontal button for the single available section
       const buttonsContainer = document.getElementById("buttonsContainer");
       buttonsContainer.innerHTML = "";
       sections.forEach((section, index) => {
@@ -448,7 +448,7 @@
           }, 100);
         });
         buttonsContainer.appendChild(btn);
-        // Auto-click the first button by default
+        // Auto-click the first (and only) button by default
         if (index === 0) {
           btn.classList.add("active-button");
           btn.click();
