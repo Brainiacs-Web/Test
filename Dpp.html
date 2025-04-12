@@ -372,7 +372,7 @@
   <div class="top-container">
     <div class="left-info">
       <div><strong>Candidate Name</strong>: <span id="logged-username">Username</span></div>
-      <div><strong>Test Name</strong>: <span>Part test 01</span></div>
+      <div><strong>Test Name</strong>: <span>DPP 01</span></div>
     </div>
     <div class="top-right">
       <div class="timer" id="timer">
@@ -387,7 +387,6 @@
   <!-- Subject Selector -->
   <div id="subject-buttons">
     <button id="subject-English" onclick="loadSubject('English')">English</button>
-    <button id="subject-Maths" onclick="loadSubject('Maths')">Maths</button>
   </div>
 
   <!-- Modal Overlay for Username -->
@@ -441,7 +440,7 @@
     let currentQuestionIndex = 0;
     let questions = [];
     let questionsBySubject = {};
-    const subjects = ["English", "Maths"];
+    const subjects = ["English"];
 
     function updateSubjectButtons() {
       subjects.forEach(subject => {
