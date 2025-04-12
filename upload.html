@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Add Questions</title>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+
+  <!-- Google Fonts and Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+  <style>
+    /* Base Reset & Fonts */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    body {
+      background: linear-gradient(to bottom, #e0f2ff, #f7faff);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    /* Form Container */
+    form {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+    }
+    h1 {
+      color: #007adf;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+    label {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+      color: #444;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      color: #333;
+    }
+    /* Options arranged in two columns */
+    .options-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .option {
+      flex: 1;
+    }
+    /* Button Container */
+    #button-container {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: linear-gradient(135deg, #009dff, #006edc);
+      color: #fff;
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      flex: 1;
+      transition: background 0.3s;
+      min-width: 100px;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #007adf, #005ab5);
+    }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    @media screen and (max-width: 600px) {
+      form {
+        padding: 20px;
+      }
+      .options-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+
+  <script type="module">
+    // Firebase configuration (same as your candidate test code)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFAzyQGNmOD6bmLnZH9evfL3V-PS4cajA",
+      authDomain: "arena-b8996.firebaseapp.com",
+      projectId: "arena-b8996",
+      storageBucket: "arena-b8996.firebasestorage.app",
+      messagingSenderId: "188106766480",
+      appId: "1:188106766480:web:801e701f00151448090015"
+    };
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const questionForm = document.getElementById("question-form");
+
+      // Helper function to safely retrieve form values
+      const getValue = (id) => {
+        const element = document.getElementById(id);
+        return element ? element.value.trim() : "";
+      };
+
+      // Preview Modal Elements
+      const previewBtn = document.getElementById("previewBtn");
+      const previewModal = document.getElementById("previewModal");
+      const previewContent = document.getElementById("previewContent");
+      const closeModal = document.querySelector(".close");
+
+      previewBtn.addEventListener("click", () => {
+        const questionText = getValue("question");
+        const questionImageURL = getValue("questionImageURL");
+        const optionA = getValue("optionA");
+        const optionB = getValue("optionB");
+        const optionC = getValue("optionC");
+        const optionD = getValue("optionD");
+        const solutionText = getValue("solution");
+        const solutionImageURL = getValue("solutionImageURL");
+
+        let previewHtml = "";
+        // Display Question
+        previewHtml += "<p><strong>Question:</strong></p>";
+        if (questionText) {
+          previewHtml += `<p>${questionText}</p>`;
+        } else if (questionImageURL) {
+          previewHtml += `<img src="${questionImageURL}" alt="Question Image" style="max-width:100%;">`;
+        }
+        // Display Options
+        previewHtml += "<p><strong>Options:</strong></p><ol type='A'>";
+        previewHtml += `<li>${optionA || "<em>No text</em>"}</li>`;
+        previewHtml += `<li>${optionB || "<em>No text</em>"}</li>`;
+        previewHtml += `<li>${optionC || "<em>No text</em>"}</li>`;
+        previewHtml += `<li>${optionD || "<em>No text</em>"}</li>`;
+        previewHtml += "</ol>";
+        // Display Solution
+        previewHtml += "<p><strong>Solution:</strong></p>";
+        if (solutionText) {
+          previewHtml += `<p>${solutionText}</p>`;
+        } else if (solutionImageURL) {
+          previewHtml += `<img src="${solutionImageURL}" alt="Solution Image" style="max-width:100%;">`;
+        } else {
+          previewHtml += `<p><em>No solution provided</em></p>`;
+        }
+        previewContent.innerHTML = previewHtml;
+        previewModal.style.display = "block";
+      });
+
+      closeModal.addEventListener("click", () => {
+        previewModal.style.display = "none";
+      });
+
+      window.addEventListener("click", (event) => {
+        if (event.target == previewModal) {
+          previewModal.style.display = "none";
+        }
+      });
+
+      questionForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Get selected section (subject) from dropdown
+        const sectionElement = document.getElementById("section");
+        if (!sectionElement) {
+          console.error("Section element not found!");
+          return;
+        }
+        const section = sectionElement.value.trim();
+        if (!section) {
+          alert("Please select a section (subject)!");
+          return;
+        }
+
+        const questionText = getValue("question");
+        const questionImageURL = getValue("questionImageURL");
+        const optionA = getValue("optionA");
+        const optionB = getValue("optionB");
+        const optionC = getValue("optionC");
+        const optionD = getValue("optionD");
+        const correctAnswer = getValue("correctAnswer");
+        const solutionText = getValue("solution");
+        const solutionImageURL = getValue("solutionImageURL");
+
+        if (!correctAnswer) {
+          alert("Please select a correct answer!");
+          return;
+        }
+
+        try {
+          // Store question under "Questions/Part02/{section}"
+          await addDoc(collection(db, "Questions", "DPP01", section), {
+            question: questionText || questionImageURL,
+            questionImage: questionText ? "" : questionImageURL,
+            options: [optionA, optionB, optionC, optionD],
+            correctAnswer: correctAnswer,
+            solution: solutionText || solutionImageURL,
+            solutionImage: solutionText ? "" : solutionImageURL,
+            addedAt: serverTimestamp()
+          });
+
+          alert("Question added successfully!");
+          questionForm.reset();
+        } catch (error) {
+          console.error("Error adding question:", error);
+          alert("Error adding question: " + error.message);
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <form id="question-form">
+    <h1>Add Questions</h1>
+    <div>
+      <label for="section">Select Section (Subject):</label>
+      <select id="section" name="section" required>
+        <option value="">--Select Section--</option>
+        <option value="English">English</option>
+        <option value="Maths">Maths</option>
+      </select>
+    </div>
+    <div>
+      <label for="question">Question:</label>
+      <input type="text" id="question" name="question" placeholder="Enter question text" autofocus>
+    </div>
+    <div>
+      <label for="questionImageURL">Question Image URL (if no text):</label>
+      <input type="text" id="questionImageURL" name="questionImageURL" placeholder="Paste image URL">
+    </div>
+    <div class="options-row">
+      <div class="option">
+        <label for="optionA">Option A:</label>
+        <input type="text" id="optionA" name="optionA" placeholder="Enter Option A">
+      </div>
+      <div class="option">
+        <label for="optionB">Option B:</label>
+        <input type="text" id="optionB" name="optionB" placeholder="Enter Option B">
+      </div>
+    </div>
+    <div class="options-row">
+      <div class="option">
+        <label for="optionC">Option C:</label>
+        <input type="text" id="optionC" name="optionC" placeholder="Enter Option C">
+      </div>
+      <div class="option">
+        <label for="optionD">Option D:</label>
+        <input type="text" id="optionD" name="optionD" placeholder="Enter Option D">
+      </div>
+    </div>
+    <div>
+      <label for="correctAnswer">Correct Answer:</label>
+      <select id="correctAnswer" name="correctAnswer" required>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+      </select>
+    </div>
+    <div>
+      <label for="solution">Solution:</label>
+      <input type="text" id="solution" name="solution" placeholder="Enter solution text">
+    </div>
+    <div>
+      <label for="solutionImageURL">Solution Image URL (if no text):</label>
+      <input type="text" id="solutionImageURL" name="solutionImageURL" placeholder="Paste solution image URL">
+    </div>
+    <div id="button-container">
+      <button type="button" id="previewBtn">Preview</button>
+      <button type="reset">Clear</button>
+      <button type="submit">Add Question</button>
+    </div>
+  </form>
+
+  <!-- Preview Modal -->
+  <div id="previewModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Preview Question</h2>
+      <div id="previewContent"></div>
+    </div>
+  </div>
+</body>
+</html>
