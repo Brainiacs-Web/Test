@@ -377,7 +377,8 @@
     <div class="top-right">
       <div class="timer" id="timer">
         <img src="https://i.postimg.cc/Fs22Dm1C/timer-1.png" alt="Timer Icon">
-        <span id="time-left">01:30:00</span>
+        <!-- Timer now displays elapsed time starting at 00:00:00 -->
+        <span id="time-left">00:00:00</span>
       </div>
       <button class="submit-btn" onclick="submitTest()">Submit Test</button>
     </div>
@@ -643,11 +644,9 @@
       }
     };
 
-    window.submitTest = function (autoSubmit = false) {
-      if (!autoSubmit) {
-        const confirmation = confirm("Are you sure you want to submit the test?");
-        if (!confirmation) return;
-      }
+    window.submitTest = function () {
+      const confirmation = confirm("Are you sure you want to submit the test?");
+      if (!confirmation) return;
       const promises = [];
       subjects.forEach(subject => {
         const subjectQuestions = questionsBySubject[subject] || [];
@@ -665,13 +664,8 @@
       Promise.all(promises)
         .then(() => {
           localStorage.clear();
-          if (autoSubmit) {
-            alert("Your test has been submitted due to inactivity.");
-            window.location.href = "cheat.html";
-          } else {
-            alert("Test submitted successfully!");
-            window.location.href = `result.html?username=${username}`;
-          }
+          alert("Test submitted successfully!");
+          window.location.href = `result.html?username=${username}`;
         })
         .catch((error) => {
           alert("Error submitting test: " + error.message);
@@ -704,26 +698,25 @@
       modal.style.display = modal.style.display === "block" ? "none" : "block";
     };
 
-    // Timer functionality
+    // Timer functionality changed:
+    // Timer now starts at 0 seconds and counts upward.
     let timerInterval;
-    let timeLeft = 90 * 60; // 1 hour 30 minutes in seconds
+    let elapsedTime = 0; // in seconds
+
     function updateTimerDisplay() {
-      const hours = String(Math.floor(timeLeft / 3600)).padStart(2, '0');
-      const minutes = String(Math.floor((timeLeft % 3600) / 60)).padStart(2, '0');
-      const seconds = String(timeLeft % 60).padStart(2, '0');
+      const hours = String(Math.floor(elapsedTime / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((elapsedTime % 3600) / 60)).padStart(2, '0');
+      const seconds = String(elapsedTime % 60).padStart(2, '0');
       document.getElementById('time-left').textContent = `${hours}:${minutes}:${seconds}`;
     }
+
     function startTimer() {
       timerInterval = setInterval(() => {
-        timeLeft--;
+        elapsedTime++;
         updateTimerDisplay();
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          alert("Time's up!");
-          submitTest();
-        }
       }, 1000);
     }
+
     window.onload = startTimer;
   </script>
 </body>
